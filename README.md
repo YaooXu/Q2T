@@ -90,5 +90,5 @@ python main.py --cuda --do_train --do_valid --do_test  --data_path data/FB15k-23
 
 Sample usage at NELL.
 ```bash
-python main.py --cuda --do_train --do_valid --do_test  --data_path data/NELL --kge_ckpt_path $kge_ckpt_path -b 1024 -n 512 -de 2000 -dr 2000 -lr 0.0004 --label_smoothing 0.6 --cpu_num 5 --geo complex --num_hidden_layers 6 --num_attention_heads 12 --hidden_size 768 --intermediate_size 768 --token_embeddings 0 --hidden_dropout_prob 0.1 --warm_up_steps 20000 --max_steps 200000 --valid_steps 5000 --tasks 1p.2p.3p.2i.3i.ip.pi.2u.up.2in.3in.inp.pin.pni --prefix logs
+python main.py --cuda --do_train --do_valid --do_test  --data_path data/NELL --kge_ckpt_path $kge_ckpt_path -b 1024 -n 512 -de 2000 -dr 2000 -lr 0.0005 --label_smoothing 0.6 --cpu_num 5 --geo complex --num_hidden_layers 6 --num_attention_heads 12 --hidden_size 768 --intermediate_size 768 --token_embeddings 0 --hidden_dropout_prob 0.1 --warm_up_steps 20000 --max_steps 200000 --valid_steps 5000 --tasks 1p.2p.3p.2i.3i.ip.pi.2u.up.2in.3in.inp.pin.pni --prefix logs
 ```
