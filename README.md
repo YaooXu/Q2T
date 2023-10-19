@@ -3,7 +3,7 @@
 
 This repository is based on [KGReasoning](https://github.com/snap-stanford/KGReasoning), containing implementation for paper `Query2Triple: Unified Query Encoding for Answering Diverse Complex Queries over Knowledge Graphs` (https://arxiv.org/abs/2310.11246).
 
-In this documentation, we detail how to train KGE checkpoints and use this checkpoints to reproduce out results in the paper.
+In this documentation, we detail how to train KGE checkpoints and use these checkpoints to reproduce out results in the paper.
 
 ## Requirement of this repository and submodule
 - networkx
