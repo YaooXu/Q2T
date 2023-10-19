@@ -1,7 +1,7 @@
 # Transforming Graph to Triple: Unified Query Encoding for Answering Diverse Complex Queries over Knowledge Graphs
 
-This repository is based on [KGReasoning](https://github.com/snap-stanford/KGReasoning), containing implementation for paper (under review):
-> Transforming Graph to Triple: Unified Query Encoding for Answering Diverse Complex Queries over Knowledge Graphs
+
+This repository is based on [KGReasoning](https://github.com/snap-stanford/KGReasoning), containing implementation for paper Transforming Graph to Triple: Unified Query Encoding for Answering Diverse Complex Queries over Knowledge Graphs (https://arxiv.org/abs/2310.11246)
 
 In this documentation, we detail how to train KGE checkpoints and use this checkpoints to reproduce out results in the paper.
 
