@@ -12,9 +12,8 @@ from torch.nn import ModuleList, Linear, BatchNorm1d
 from torch.nn.init import xavier_normal_, kaiming_uniform_, kaiming_normal_
 from torch_geometric.data import Data
 from transformers import BertConfig
-from torch_geometric.nn import MLP, RGCNConv
+from torch_geometric.nn import MLP
 from .modeling_bert import BertModel
-from .transformer_conv import TransformerConv
 
 from tqdm import tqdm
 from utils import OFFSET, REL_CLS, ENT_CLS, TYPE_TO_IDX, \
@@ -419,53 +418,6 @@ class BertEncoder(nn.Module):
 
         return h, r, None
 
-
-class GNNEncoder(nn.Module):
-    def __init__(self, kwargs):
-        super().__init__()
-        self.kwargs = kwargs
-
-        self.dim_ent_embedding = kwargs['dim_ent_embedding']
-        self.dim_rel_embedding = kwargs['dim_rel_embedding']
-        self.hidden_size = kwargs['hidden_size']
-        self.num_heads = kwargs['num_attention_heads']
-        self.p_dropout = kwargs['hidden_dropout_prob']
-        self.num_layers = kwargs['num_hidden_layers']
-        self.intermediate_size = kwargs['intermediate_size']
-
-        self.device = torch.device('cuda') if kwargs['cuda'] else torch.device('cpu')
-
-        self.embedding = TokenEmbedding(kwargs)
-
-        self.layers = ModuleList([
-            TransformerConv(kwargs)
-            for _ in range(self.num_layers)
-        ])
-
-        self.rev_proj1 = nn.Linear(self.hidden_size, self.dim_ent_embedding)
-        self.rev_proj2 = nn.Linear(self.hidden_size, self.dim_rel_embedding)
-
-    def forward(self, initial_node_embeddings,
-                layers, node_types, target,
-                x, edge_index, batch):
-        node_embeddings = self.embedding(initial_node_embeddings,
-                                         layers, node_types, target)
-
-        layer_to_node_embedding = []
-        for i in range(len(self.layers)):
-            layer = self.layers[i]
-            node_embeddings = layer(node_embeddings, edge_index, batch)
-            layer_to_node_embedding.append(node_embeddings)
-
-        cls1 = node_embeddings[torch.where(x == ENT_CLS)]
-        cls2 = node_embeddings[torch.where(x == REL_CLS)]
-
-        h = self.rev_proj1(cls1)
-        r = self.rev_proj2(cls2)
-
-        return h, r
-
-
 class KGE(nn.Module):
     def __init__(self, num_ents, num_rels,
                  dim_ent_embedding, dim_rel_embedding,
@@ -722,43 +674,3 @@ class RESCAL(KGE):
 
         self.ent_embedding.weight.data = params['entity.weight']
         self.rel_embedding.weight.data = params['relation.weight']
-
-# class AdaptiveMLP(nn.Module):
-#     def __init__(self, hidden_size, dim, n):
-#         super().__init__()
-#         self.dim = dim
-#         self.hidden_size = hidden_size
-#         self.n = n
-#         self.base = 100
-#
-#         self.to_w = nn.Linear(self.hidden_size, self.n)
-#         self.dW1 = nn.Parameter(torch.randn((self.n, self.hidden_size, self.base)))
-#         self.dW2 = nn.Parameter(torch.randn((self.n, self.base, self.dim)))
-#
-#         self.W = nn.Parameter(torch.randn((self.hidden_size, self.dim)))
-#         self.b = nn.Parameter(torch.zeros((self.dim,)))
-#
-#         self.a = nn.Parameter(torch.tensor([0.1]))
-#
-#         self.init_weight()
-#
-#     def init_weight(self):
-#         self.dW1.data.normal_(mean=0.0, std=0.02)
-#         self.dW2.data.normal_(mean=0.0, std=0.02)
-#         self.W.data.normal_(mean=0.0, std=0.02)
-#
-#     def forward(self, control_msg: Tensor, inputs: Tensor):
-#         # [batch, n]
-#         w = F.softmax(self.to_w(control_msg), dim=-1)
-#
-#         # [n, hidden_size, dim]
-#         dW = torch.bmm(self.dW1, self.dW2)
-#         # weights = self.W
-#
-#         # [batch, 1, n] [n, hidden_size * dim] -> [batch, hidden_size, dim]
-#         dW = torch.matmul(w.unsqueeze(1), dW.view(self.n, -1)).view(-1, self.hidden_size, self.dim)
-#
-#         weight = self.a * self.W.view(-1, self.hidden_size, self.dim) + (1 - self.a) * dW
-#         outputs = torch.bmm(inputs.unsqueeze(1), weight).squeeze() + self.b
-#
-#         return outputs, None

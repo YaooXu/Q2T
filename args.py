@@ -136,9 +136,8 @@ def post_init_args(args):
         # save key file
         shutil.copy('./main.py', os.path.join(args.save_path, 'main.py'))
         shutil.copy('./query_format_converter.py', os.path.join(args.save_path, 'query_format_converter.py'))
-        shutil.copy('Models/query2triple.py', os.path.join(args.save_path, 'prompt_cqa.py'))
-        shutil.copy('./Models/modeling_bert.py', os.path.join(args.save_path, 'modeling_bert.py'))
-        shutil.copy('./Models/transformer_conv.py', os.path.join(args.save_path, 'transformer_conv.py'))
+        shutil.copy('./models//query2triple.py', os.path.join(args.save_path, 'prompt_cqa.py'))
+        shutil.copy('./models/modeling_bert.py', os.path.join(args.save_path, 'modeling_bert.py'))
         shutil.copy('./utils/util.py', os.path.join(args.save_path, 'util.py'))
 
     # set logger after setting save_path

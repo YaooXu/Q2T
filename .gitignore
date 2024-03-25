@@ -13,11 +13,6 @@ submission/
 /ssl-relation-prediction/src/src_data
 /ssl-relation-prediction/src/ckpts
 /ssl-relation-prediction/src/wandb
-/large_data/
 
-/Models/dagnn.py
-/utils/generate_nt_file.py
-/Models/ode_gnn.py
-/Models/regularizers.py
-/Models/utils.py
-/Models/vec_gnn.py
+.history
+dev

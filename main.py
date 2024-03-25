@@ -11,10 +11,8 @@ from torch.optim.lr_scheduler import ExponentialLR, LambdaLR, StepLR
 from torch.utils.data import DataLoader, WeightedRandomSampler
 
 from args import parse_args
-from models import KGReasoning
-from Models import Query2Triple
-from dataset import TestDataset, TrainDataset, SingledirectionalOneShotIterator, \
-    query_structure_to_type, load_data, Q2TTrainDataset, Q2TTestDataset, flatten_query
+from models import Query2Triple
+from dataset import SingledirectionalOneShotIterator, query_structure_to_type, load_data, Q2TTrainDataset, Q2TTestDataset, flatten_query
 from tensorboardX import SummaryWriter
 
 from collections import defaultdict
@@ -69,10 +67,7 @@ def main(args):
 
     tasks, num_ents, num_rels = args.tasks, args.num_ents, args.num_rels
 
-    if args.geo in ('box', 'vec', 'beta'):
-        TrainDataset_, TestDataset_ = (TrainDataset, TestDataset)
-    else:
-        TrainDataset_, TestDataset_ = (Q2TTrainDataset, Q2TTestDataset)
+    TrainDataset_, TestDataset_ = (Q2TTrainDataset, Q2TTestDataset)
 
     if not args.do_train:  # if not training, then create tensorboard files in some tmp location
         writer = SummaryWriter('./logs-debug/unused-tb')
@@ -165,32 +160,18 @@ def main(args):
                 collate_fn=TestDataset_.collate_fn
             )
 
-    if args.geo in ['beta', 'vec', 'box']:
-        model = KGReasoning(
-            num_ent=num_ents,
-            num_rel=num_rels,
-            hidden_dim=args.hidden_dim,
-            gamma=args.gamma,
-            geo=args.geo,
-            use_cuda=args.cuda,
-            box_mode=eval_tuple(args.box_mode),
-            beta_mode=eval_tuple(args.beta_mode),
-            test_batch_size=args.test_batch_size,
-            query_name_dict=query_structure_to_type
-        )
+    Model = Query2Triple
+
+    if args.ckpt_path is not None:
+        with open(os.path.join(args.ckpt_path, 'config.json')) as f:
+            kwargs = json.load(f)
     else:
-        Model = Query2Triple
+        kwargs = vars(args)
 
-        if args.ckpt_path is not None:
-            with open(os.path.join(args.ckpt_path, 'config.json')) as f:
-                kwargs = json.load(f)
-        else:
-            kwargs = vars(args)
-
-        model = Model(
-            edge_to_entities=edge_to_entities,
-            **kwargs
-        )
+    model = Model(
+        edge_to_entities=edge_to_entities,
+        **kwargs
+    )
 
     logging.info('Model Parameter Configuration:')
     num_params = 0
